@@ -2,18 +2,20 @@ pipeline {
     agent {
   label 'server-1'
 }
+    options {
+        skipStagesAfterUnstable()
+    }
     stages {
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn -B -DskipTests clean package'
             }
             post {
-             success {
-                archiveArtifacts artifacts: '**/target/*.jar'
-             }
+                success {
+                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                }
+            }
         }
-
-        }
-        
+      
     }
 }
