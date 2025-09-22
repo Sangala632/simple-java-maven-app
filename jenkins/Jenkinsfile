@@ -2,15 +2,15 @@ pipeline {
     agent {
   label 'server-1'
 }
-environment {
-  Name = "learn-jenkins"
+    parameters {
+        string defaultValue: 'Sangala', name: 'LAST_NAME'
+}
+    environment {
+        Name = "Sreekanth"
 }
     tools {
-  maven 'MAVEN_HOME'
+        maven 'MAVEN_HOME'
 }
- parameters {
-        string(name: 'PERSON', defaultValue: 'Mr sreekanth', description: 'Who should I say hello to?')
- }
     options {
         skipStagesAfterUnstable()
     }
@@ -18,7 +18,7 @@ environment {
         stage('Build') {
             steps {
                 bat 'mvn -B -DskipTests clean package'
-                echo "Hello, ${params.PERSON}. This is ${env.Name}"
+                echo "Hello, $Name ${params.$name}."
             }
             post {
                 success {
