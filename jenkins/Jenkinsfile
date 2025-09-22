@@ -3,13 +3,13 @@ pipeline {
   label 'server-1'
 }
 environment {
-  Name = "sreekanth"
+  Name = "learn-jenkins"
 }
     tools {
   maven 'MAVEN_HOME'
 }
  parameters {
-        string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+        string(name: 'PERSON', defaultValue: 'Mr sreekanth', description: 'Who should I say hello to?')
  }
     options {
         skipStagesAfterUnstable()
