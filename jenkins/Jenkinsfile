@@ -20,12 +20,28 @@ pipeline {
                 bat 'mvn -B -DskipTests clean package'
                 echo "Hello, $Name ${params.$name}."
             }
+        }
+        stage('test') {
+            parellel {
+                stage ('test a') {
+                    steps {
+                        echo 'this is test a'
+                        bat 'mvn test'
+                    }
+                    stage ('test b') {
+                        steps {
+                            echo 'this is test b'
+                            bat 'mvn test'
+                        }
+                }
+            }
             post {
                 success {
                     archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
                 }
             }
         }
+          
       
     }
 }
