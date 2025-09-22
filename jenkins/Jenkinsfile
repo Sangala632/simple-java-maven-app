@@ -2,6 +2,9 @@ pipeline {
     agent {
   label 'server-1'
 }
+environment {
+  Name = "sreekanth"
+}
     tools {
   maven 'MAVEN_HOME'
 }
@@ -15,6 +18,7 @@ pipeline {
         stage('Build') {
             steps {
                 bat 'mvn -B -DskipTests clean package'
+                echo "Hello, ${params.PERSON}. This is ${env.Name}"
             }
             post {
                 success {
