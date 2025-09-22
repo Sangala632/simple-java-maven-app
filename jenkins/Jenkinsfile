@@ -1,47 +1,53 @@
 pipeline {
     agent {
-  label 'server-1'
-}
+        label 'server-1'
+    }
+
     parameters {
-        string defaultValue: 'Sangala', name: 'LAST_NAME'
-}
+        string(name: 'LAST_NAME', defaultValue: 'Sangala')
+    }
+
     environment {
-        Name = "Sreekanth"
-}
+        NAME = "Sreekanth"
+    }
+
     tools {
         maven 'MAVEN_HOME'
-}
+    }
+
     options {
         skipStagesAfterUnstable()
     }
+
     stages {
         stage('Build') {
             steps {
                 bat 'mvn -B -DskipTests clean package'
-                echo "Hello, $Name ${params.$name}."
+                echo "Hello, ${env.NAME} ${params.LAST_NAME}."
             }
         }
-        stage('test') {
-            parellel {
-                stage ('test a') {
+
+        stage('Test') {
+            parallel {
+                stage('Test A') {
                     steps {
-                        echo 'this is test a'
+                        echo 'This is Test A'
                         bat 'mvn test'
                     }
-                    stage ('test b') {
-                        steps {
-                            echo 'this is test b'
-                            bat 'mvn test'
-                        }
                 }
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                stage('Test B') {
+                    steps {
+                        echo 'This is Test B'
+                        bat 'mvn test'
+                    }
                 }
             }
         }
-          
-      
+    }
+
+    post {
+        success {
+            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+        }
     }
 }
