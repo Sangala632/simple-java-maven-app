@@ -1,11 +1,11 @@
 pipeline {
     agent {
-        label 'server-1'
+        label 'dev-server'
     }
 
     parameters {
-        string(name: 'LAST_NAME', defaultValue: 'Sangala')
-    }
+        choice choices: ['dev', 'prod'], name: 'Seleect_envirament'
+        }
 
     environment {
         NAME = "Sreekanth"
@@ -23,31 +23,48 @@ pipeline {
         stage('Build') {
             steps {
                 bat 'mvn -B -DskipTests clean package'
-                echo "Hello, ${env.NAME} ${params.LAST_NAME}."
             }
         }
 
         stage('Test') {
             parallel {
                 stage('Test A') {
+                    agent {
+                        label 'dev-server'
+                    }
                     steps {
                         echo 'This is Test A'
                         bat 'mvn test'
                     }
                 }
                 stage('Test B') {
+                    agent {
+                        label 'dev-server'
+                    }
                     steps {
                         echo 'This is Test B'
                         bat 'mvn test'
                     }
                 }
             }
+             post {
+        success {
+            dir ('target/surefire-reports') {
+                junit '**/TEST-*.xml'
+            }
+        }
+    }
+        }
+
+        stage('Deploy') {
+            when {
+                expression { params.Seleect_envirament == 'prod' }
+            }
+            steps {
+                echo "Deploying to production environment"
+            }
         }
     }
 
-    post {
-        success {
-            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-        }
-    }
+   
 }
