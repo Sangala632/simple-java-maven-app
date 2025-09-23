@@ -4,8 +4,8 @@ pipeline {
     }
 
     parameters {
-        choice choices: ['dev', 'prod'], name: 'Seleect_envirament'
-        }
+        choice choices: ['dev', 'prod'], name: 'Select_environment'
+    }
 
     environment {
         NAME = "Sreekanth"
@@ -29,42 +29,40 @@ pipeline {
         stage('Test') {
             parallel {
                 stage('Test A') {
-                    agent {
-                        label 'dev-server'
-                    }
                     steps {
                         echo 'This is Test A'
                         bat 'mvn test'
                     }
                 }
                 stage('Test B') {
-                    agent {
-                        label 'dev-server'
-                    }
                     steps {
                         echo 'This is Test B'
                         bat 'mvn test'
                     }
                 }
             }
-             post {
-        success {
-            dir ('target/surefire-reports') {
-                junit '**/TEST-*.xml'
+            post {
+                success {
+                    dir('target/surefire-reports') {
+                        junit '**/TEST-*.xml'
+                    }
+                }
             }
-        }
-    }
         }
 
         stage('Deploy') {
             when {
-                expression { params.Seleect_envirament == 'prod' }
+                expression { params.Select_environment == 'prod' }
             }
             steps {
-                echo "Deploying to production environment"
+                echo "Deploying to Apache on Windows"
+
+                bat '''
+                net stop Apache2.4 || exit 0
+                xcopy target\\* C:\\Apache24\\htdocs /E /Y
+                net start Apache2.4
+                '''
             }
         }
     }
-
-   
 }
